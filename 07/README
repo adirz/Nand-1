@@ -1,0 +1,18 @@
+adirz, boogalla
+===============================================================================
+Adir Zagury 304862337, David Ariel 302546163
+===============================================================================
+
+                        Project 7- VMtranslator
+                        -----------------------
+
+
+Submitted Files
+---------------
+README - This file.
+VMtranslator.py - Contains a main function, receive .vm file or dir and generates .asm file.
+Parser.py - Contains a class that parse the .vm file line by line and reads values of commands.
+CodeWriter.py - Generate asm instruction from commands from the parser.
+makefile - Does nothing, as it is more convinient to add a bash file
+VMtranslator - a bash file to run the translator
+
