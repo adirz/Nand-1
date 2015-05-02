@@ -17,8 +17,10 @@ class VMtranslator(object):
 
     def _gen_command(self):
         command_type = self.parser.command_type()
-        if command_type == Parser.C_PUSH or command_type == Parser.C_POP:
-            self.code_writer.write_push_pop(self.parser.current_commands[0], self.parser.arg1(), self.parser.arg2())
+        if command_type == Parser.C_PUSH:
+            self.code_writer.write_push(self.parser.arg1(), self.parser.arg2())
+        elif command_type == Parser.C_POP:
+            self.code_writer.write_pop(self.parser.arg1(), self.parser.arg2())
         elif command_type == Parser.C_ARITHMETIC:
             self.code_writer.write_arithmetic(self.parser.arg1())
 
