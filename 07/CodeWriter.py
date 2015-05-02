@@ -1,3 +1,4 @@
+import os
 ARITH_COMMANDS = ["add", "sub", "neg", "eq", "gt", "lt", "and", "or", "not"]
 COMMANDS = ["push", "pop", "label", "goto", "if-goto", "function", "return", "call"]
 
@@ -18,7 +19,7 @@ class CodeWriter(object):
 
     def __init__(self, output_file_path):
         self._output_file = open(output_file_path, "w")
-        #SP = 256
+        self._file_name = os.path.basename(os.path.splitext(output_file_path)[0])
         self._a_instruction(str(STACK_BASE_ADDRESS))
         self._c_instruction("D", "A", None)
         self._set_var("SP")
@@ -76,16 +77,16 @@ class CodeWriter(object):
     def _unary_command(self, comp):
         self._output_file.write("\n")
         self._pop_to_dest("A")
-        self._c_instruction("D", comp +"A", None)
+        self._c_instruction("D", comp + "A", None)
         self._push_dest("D")
         self._output_file.write("\n")
 
     #in case of comp use jump
     def _jump(self, comp, jump):
         self._label_count += 1
-        self._a_instruction("LBL"+str(self._label_count))
+        self._a_instruction("LBL" + str(self._label_count))
         self._c_instruction(None, comp, jump)
-        return 'LBL'+str(self._label_count)
+        return "LBL" + str(self._label_count)
 
     #commands using jumps
     def _compare_command(self, action):
@@ -104,7 +105,7 @@ class CodeWriter(object):
         self._output_file.write("\n")
 
     #by the given command_type call the correct writer function
-    def WriteArithmetic(self, command_type):
+    def write_arithmetic(self, command_type):
         self._output_file.write("\n")
         func, arg = {
             "add"   : [self._binary_command,    "+"],
@@ -121,7 +122,7 @@ class CodeWriter(object):
         self._output_file.write("\n")
 
     #a coomon between some push commands
-    def pushRegs(self, segment, index):
+    def _push_regs(self, segment, index):
         self._a_instruction(segment)
         self._c_instruction("D", "M", None)
         self._a_instruction(str(index))
@@ -129,7 +130,7 @@ class CodeWriter(object):
         self._c_instruction("D", "M", None)
 
     #a coomon between some pop commands
-    def popRegs(self, segment, index):
+    def _pop_regs(self, segment, index):
         self._a_instruction(segment)
         self._c_instruction("D", "M", None)
         self._a_instruction(str(index))
@@ -137,23 +138,23 @@ class CodeWriter(object):
         self._set_var("R"+str(REG))
 
     #by the given command, segment, index call the correct writer function
-    def WritePushPop(self, command, segment, index):
+    def write_push_pop(self, command, segment, index):
         self._output_file.write("\n")
         if command == "push":
             if segment == "argument" :
-                self.pushRegs(str(ARG), index)
+                self._push_regs(str(ARG), index)
             elif segment == "local":
-                self.pushRegs(str(LCL), index)
+                self._push_regs(str(LCL), index)
             elif segment == "static":
-                self._a_instruction(self._file_name+str(index))
+                self._a_instruction(self._file_name + str(index))
                 self._c_instruction("D", "M", None)
             elif segment == "constant":
                 self._a_instruction(str(index))
                 self._c_instruction("D", "A", None)
             elif segment == "this":
-                self.pushRegs(str(THIS), index)
+                self._push_regs(str(THIS), index)
             elif segment == "that":
-                self.pushRegs(str(THAT), index)
+                self._push_regs(str(THAT), index)
             elif segment == "pointer":
                 self._a_instruction(str(THIS + index))
                 self._c_instruction("D", "M", None)
@@ -163,17 +164,17 @@ class CodeWriter(object):
             self._push_dest("D")
         elif command == "pop":
             if segment == "argument":
-                self.popRegs(str(ARG), str(index))
+                self._pop_regs(str(ARG), str(index))
             elif segment == "local":
-                self.popRegs(str(LCL), str(index))
+                self._pop_regs(str(LCL), str(index))
             elif segment == "static":
                 self._a_instruction(self._file_name+str(index))
                 self._c_instruction("D", "A", None)
                 self._set_var("R"+str(REG))
             elif segment == "this":
-                self.popRegs(str(THIS), str(index))
+                self._pop_regs(str(THIS), str(index))
             elif segment == "that":
-                self.popRegs(str(THAT), str(index))
+                self._pop_regs(str(THAT), str(index))
             elif segment == "pointer":
                 self._a_instruction(str(THIS + index))
                 self._c_instruction("D", "A", None)

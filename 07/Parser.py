@@ -48,7 +48,7 @@ class Parser(object):
         self.lines = cleared_lines
 
     def _clear_line(self, line):
-        return line.split(COMMENT_PREFIX)[0].replace("\n","")
+        return line.split(COMMENT_PREFIX)[0].replace("\n","").replace("\r","")
 
     def _line_to_command(self, line):
         return line.split(" ")
